@@ -94,6 +94,35 @@ int addNewContact(vector <ContactData>& addressBook, int numberOfContacts) {
     return numberOfContacts + 1;
 }
 
+int loginUser(vector <UserData>& users, int numberOfUsers) {
+    string login, password;
+
+    cin.sync();
+    cout << "Enter login: ";
+    getline(cin, login, '\n');
+    int i = 0;
+    while (i < numberOfUsers) {
+        if (users[i].login == login) {
+            for (int attempt = 0; attempt < 3; attempt++) {
+                cout << "Enter password. " << 3 - attempt << " attempts left: ";
+                getline(cin, password, '\n');
+                if (users[i].password == password) {
+                    cout << "You have logged in\n";
+                    Sleep(1000);
+                    return users[i].id;
+                }
+            }
+            cout << "You have entered the password incorrectly 3 times. Return to the main menu\n";
+            Sleep(3000);
+            return 0;
+        }
+        i++;
+    }
+    cout << "There is no such user!\n";
+    Sleep(1000);
+    return 0;
+}
+
 void viewContact(vector <ContactData>& addressBook, int i) {
     cout << addressBook[i].id << "|";
     cout << addressBook[i].firstName << "|" << addressBook[i].lastName << "|";
@@ -351,25 +380,44 @@ int main() {
     vector <UserData> users;
     vector <ContactData> addressBook;
     char userSelection;
+    int idLoggedUser = 0;
     int numberOfUsers = 0;
-    int numberOfContacts = 0;
+    //int numberOfContacts = 0;
 
     numberOfUsers = loadDataFileUsers(users, numberOfUsers);
 
     while(1) {
-        system("cls");
-        cout << "---ADRESS BOOK---\n";
-        cout << "1. Registration\n";
-        cout << "3. Exit\n";
-        cout << "Your choice: ";
-        cin >> userSelection;
+        if (idLoggedUser == 0) {
+            system("cls");
+            cout << "---ADRESS BOOK---\n";
+            cout << "1. Log in\n";
+            cout << "2. Registration\n";
+            cout << "3. Exit\n";
+            cout << "Your choice: ";
+            cin >> userSelection;
 
-        switch(userSelection) {
-        case '1':
-            numberOfUsers = addNewUser(users, numberOfUsers);
-            break;
-        case '3':
-            exit (0);
+            switch(userSelection) {
+            case '1':
+                idLoggedUser = loginUser(users, numberOfUsers);
+                break;
+            case '2':
+                numberOfUsers = addNewUser(users, numberOfUsers);
+                break;
+            case '3':
+                exit (0);
+            }
+        } else {
+            system("cls");
+            cout << "---ADRESS BOOK---\n";
+            cout << "8. Log out\n";
+            cout << "Your choice: ";
+            cin >> userSelection;
+
+            switch(userSelection) {
+            case '8':
+                idLoggedUser = 0;
+                break;
+            }
         }
         /*numberOfContacts = loadDataFileAddressBook(addressBook, numberOfContacts);
 
@@ -408,5 +456,5 @@ int main() {
             case '9':
                 exit(0);
             }*/
-        }
     }
+}
