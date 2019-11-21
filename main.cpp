@@ -50,7 +50,7 @@ int addNewUser(vector <UserData>& users, int numberOfUsers) {
     return numberOfUsers + 1;
 }
 
-int addNewContact(vector <ContactData>& addressBook, int numberOfContacts) {
+int addNewContact(int idLoggedUser, vector <ContactData>& addressBook, int numberOfContacts, int &idLastContactAdressBook) {
     string firstName, lastName, phoneNumber, email, address;
     int id = 1;
     fstream addressBookFile;
@@ -75,13 +75,12 @@ int addNewContact(vector <ContactData>& addressBook, int numberOfContacts) {
         }
     }
 
-    if (numberOfContacts != 0) {
-        id = addressBook[numberOfContacts - 1].id + 1;
-    }
+    id = ++idLastContactAdressBook;
 
     addressBook.push_back(ContactData {id, firstName, lastName, phoneNumber, email, address});
     addressBookFile.open("Adress_Book.txt", ios::out | ios::app);
     addressBookFile << id << "|";
+    addressBookFile << idLoggedUser << "|";
     addressBookFile << firstName << "|";
     addressBookFile << lastName << "|";
     addressBookFile << phoneNumber << "|";
@@ -170,11 +169,12 @@ void viewAllContacts(vector <ContactData>& addressBook, int numberOfContacts) {
     system("pause");
 }
 
-int loadDataFileUsers (vector <UserData>& users, int numberOfUsers) {
+int loadDataFileUsers (vector <UserData>& users) {
     fstream usersFile;
     int id;
     string login, password, dataLineUsersFile;
     int lineNumberUsersFile = 1;
+    int numberOfUsers = 0;
 
     if (usersFile.good()) {
         usersFile.open("Users.txt", ios::in);
@@ -202,39 +202,46 @@ int loadDataFileUsers (vector <UserData>& users, int numberOfUsers) {
     return numberOfUsers;
 }
 
-int loadDataFileAddressBook (vector <ContactData>& addressBook, int numberOfContacts) {
+int loadDataFileAddressBook (int idLoggedUser, vector <ContactData>& addressBook, int &idLastContactAdressBook) {
     fstream addressBookFile;
-    int id;
+    int idUser, idContact;
     string firstName, lastName, phoneNumber, email, address, dataLineAddressBookFile;
     int lineNumberAddressBookFile = 1;
+    int numberOfContacts = 0;
 
     if (addressBookFile.good()) {
         addressBookFile.open("Adress_Book.txt", ios::in);
         while(getline(addressBookFile, dataLineAddressBookFile, '|')) {
             switch(lineNumberAddressBookFile) {
             case 1:
-                id = atoi(dataLineAddressBookFile.c_str());
+                idContact = atoi(dataLineAddressBookFile.c_str());
                 break;
             case 2:
-                firstName = dataLineAddressBookFile;
+                idUser = atoi(dataLineAddressBookFile.c_str());
                 break;
             case 3:
-                lastName = dataLineAddressBookFile;
+                firstName = dataLineAddressBookFile;
                 break;
             case 4:
-                phoneNumber = dataLineAddressBookFile;
+                lastName = dataLineAddressBookFile;
                 break;
             case 5:
-                email = dataLineAddressBookFile;
+                phoneNumber = dataLineAddressBookFile;
                 break;
             case 6:
+                email = dataLineAddressBookFile;
+                break;
+            case 7:
                 address = dataLineAddressBookFile;
                 break;
             }
-            if (lineNumberAddressBookFile == 6) {
-                addressBook.push_back(ContactData {id, firstName, lastName, phoneNumber, email, address});
+            if (lineNumberAddressBookFile == 7) {
+                if (idUser == idLoggedUser) {
+                    addressBook.push_back(ContactData {idContact, firstName, lastName, phoneNumber, email, address});
+                    numberOfContacts++;
+                }
+                idLastContactAdressBook = idContact;
                 lineNumberAddressBookFile = 0;
-                numberOfContacts++;
             }
             lineNumberAddressBookFile++;
         }
@@ -382,9 +389,10 @@ int main() {
     char userSelection;
     int idLoggedUser = 0;
     int numberOfUsers = 0;
-    //int numberOfContacts = 0;
+    int numberOfContacts = 0;
+    int idLastContactAdressBook = 0;
 
-    numberOfUsers = loadDataFileUsers(users, numberOfUsers);
+    numberOfUsers = loadDataFileUsers(users);
 
     while(1) {
         if (idLoggedUser == 0) {
@@ -399,6 +407,8 @@ int main() {
             switch(userSelection) {
             case '1':
                 idLoggedUser = loginUser(users, numberOfUsers);
+                if (idLoggedUser != 0)
+                    numberOfContacts = loadDataFileAddressBook(idLoggedUser, addressBook, idLastContactAdressBook);
                 break;
             case '2':
                 numberOfUsers = addNewUser(users, numberOfUsers);
@@ -409,35 +419,31 @@ int main() {
         } else {
             system("cls");
             cout << "---ADRESS BOOK---\n";
+            cout << "1. Add contact\n";
             cout << "8. Log out\n";
             cout << "Your choice: ";
             cin >> userSelection;
 
             switch(userSelection) {
+            case '1':
+                numberOfContacts = addNewContact(idLoggedUser, addressBook, numberOfContacts, idLastContactAdressBook);
+                break;
             case '8':
+                addressBook.clear();
                 idLoggedUser = 0;
                 break;
             }
         }
-        /*numberOfContacts = loadDataFileAddressBook(addressBook, numberOfContacts);
-
-        while(1) {
-            system("cls");
-            cout << "---ADRESS BOOK---\n";
-            cout << "1. Add contact\n";
+        /*
             cout << "2. Search by first name\n";
             cout << "3. Search by last name\n";
             cout << "4. View all contacts\n";
             cout << "5. Delete contact\n";
             cout << "6. Edit contact\n";
-            cout << "9. Exit\n";
             cout << "Your choice: ";
             cin >> userSelection;
 
             switch(userSelection) {
-            case '1':
-                numberOfContacts = addNewContact(addressBook, numberOfContacts);
-                break;
             case '2':
                 searchFirstName(addressBook, numberOfContacts);
                 break;
@@ -453,8 +459,6 @@ int main() {
             case '6':
                 editContactData(addressBook, numberOfContacts);
                 break;
-            case '9':
-                exit(0);
             }*/
     }
 }
