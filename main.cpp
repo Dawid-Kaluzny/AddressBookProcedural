@@ -420,6 +420,7 @@ int main() {
             system("cls");
             cout << "---ADRESS BOOK---\n";
             cout << "1. Add contact\n";
+            cout << "2. Search by first name\n";
             cout << "8. Log out\n";
             cout << "Your choice: ";
             cin >> userSelection;
@@ -428,6 +429,9 @@ int main() {
             case '1':
                 numberOfContacts = addNewContact(idLoggedUser, addressBook, numberOfContacts, idLastContactAdressBook);
                 break;
+            case '2':
+                searchFirstName(addressBook, numberOfContacts);
+                break;
             case '8':
                 addressBook.clear();
                 idLoggedUser = 0;
@@ -435,18 +439,11 @@ int main() {
             }
         }
         /*
-            cout << "2. Search by first name\n";
             cout << "3. Search by last name\n";
             cout << "4. View all contacts\n";
             cout << "5. Delete contact\n";
             cout << "6. Edit contact\n";
-            cout << "Your choice: ";
-            cin >> userSelection;
 
-            switch(userSelection) {
-            case '2':
-                searchFirstName(addressBook, numberOfContacts);
-                break;
             case '3':
                 searchLastName(addressBook, numberOfContacts);
                 break;
@@ -459,6 +456,6 @@ int main() {
             case '6':
                 editContactData(addressBook, numberOfContacts);
                 break;
-            }*/
+        */
     }
 }
