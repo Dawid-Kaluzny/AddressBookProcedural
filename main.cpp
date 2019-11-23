@@ -136,7 +136,6 @@ void searchFirstName(vector <ContactData>& addressBook, int numberOfContacts) {
     cin.ignore();
     cout << "Enter first name: ";
     getline(cin, firstName, '\n');
-    cout << endl;
 
     for (int i = 0; i < numberOfContacts; i++) {
         if (addressBook[i].firstName == firstName) {
@@ -152,7 +151,6 @@ void searchLastName(vector <ContactData>& addressBook, int numberOfContacts) {
     cin.ignore();
     cout << "Enter last name: ";
     getline(cin, lastName, '\n');
-    cout << endl;
 
     for (int i = 0; i < numberOfContacts; i++) {
         if (addressBook[i].lastName == lastName) {
@@ -421,6 +419,7 @@ int main() {
             cout << "---ADRESS BOOK---\n";
             cout << "1. Add contact\n";
             cout << "2. Search by first name\n";
+            cout << "3. Search by last name\n";
             cout << "8. Log out\n";
             cout << "Your choice: ";
             cin >> userSelection;
@@ -432,6 +431,9 @@ int main() {
             case '2':
                 searchFirstName(addressBook, numberOfContacts);
                 break;
+            case '3':
+                searchLastName(addressBook, numberOfContacts);
+                break;
             case '8':
                 addressBook.clear();
                 idLoggedUser = 0;
@@ -439,14 +441,10 @@ int main() {
             }
         }
         /*
-            cout << "3. Search by last name\n";
             cout << "4. View all contacts\n";
             cout << "5. Delete contact\n";
             cout << "6. Edit contact\n";
 
-            case '3':
-                searchLastName(addressBook, numberOfContacts);
-                break;
             case '4':
                 viewAllContacts(addressBook, numberOfContacts);
                 break;
