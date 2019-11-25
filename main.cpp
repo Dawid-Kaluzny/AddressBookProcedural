@@ -420,6 +420,7 @@ int main() {
             cout << "1. Add contact\n";
             cout << "2. Search by first name\n";
             cout << "3. Search by last name\n";
+            cout << "4. View all contacts\n";
             cout << "8. Log out\n";
             cout << "Your choice: ";
             cin >> userSelection;
@@ -434,6 +435,9 @@ int main() {
             case '3':
                 searchLastName(addressBook, numberOfContacts);
                 break;
+            case '4':
+                viewAllContacts(addressBook, numberOfContacts);
+                break;
             case '8':
                 addressBook.clear();
                 idLoggedUser = 0;
@@ -441,13 +445,9 @@ int main() {
             }
         }
         /*
-            cout << "4. View all contacts\n";
             cout << "5. Delete contact\n";
             cout << "6. Edit contact\n";
 
-            case '4':
-                viewAllContacts(addressBook, numberOfContacts);
-                break;
             case '5':
                 numberOfContacts = deleteContactData(addressBook, numberOfContacts);
                 break;
