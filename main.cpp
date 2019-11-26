@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <fstream>
 #include <vector>
+#include <cstdio>
 
 using namespace std;
 
@@ -251,7 +252,11 @@ int loadDataFileAddressBook (int idLoggedUser, vector <ContactData>& addressBook
 int deleteContactData(vector <ContactData>& addressBook, int numberOfContacts) {
     int id;
     char userSelection;
-    fstream addressBookFile;
+    fstream addressBookFile, addressBookFileTemporary;
+    string firstName, lastName, phoneNumber, email, address;
+    int idUser, idContact;
+    string dataLineAddressBookFile;
+    int lineNumberAddressBookFile = 1;
 
     cin.ignore();
     cout << "Enter the user ID: ";
@@ -267,19 +272,54 @@ int deleteContactData(vector <ContactData>& addressBook, int numberOfContacts) {
 
             if (userSelection == 'y') {
                 addressBook.erase(addressBook.begin() + i);
-                remove("Adress_Book.txt");
-                addressBookFile.open("Adress_Book.txt", ios::out | ios::app);
-                for (int j = 0; j < addressBook.size(); j++) {
-                    addressBookFile << addressBook[j].id << "|";
-                    addressBookFile << addressBook[j].firstName << "|";
-                    addressBookFile << addressBook[j].lastName << "|";
-                    addressBookFile << addressBook[j].phoneNumber << "|";
-                    addressBookFile << addressBook[j].email << "|";
-                    addressBookFile << addressBook[j].address << "|" << endl;
+                if (addressBookFile.good()) {
+                    addressBookFile.open("Adress_Book.txt", ios::in);
+                    addressBookFileTemporary.open("Adress_Book_Temporary.txt", ios::out | ios::app);
+                    while(getline(addressBookFile, dataLineAddressBookFile, '|')) {
+                        switch(lineNumberAddressBookFile) {
+                        case 1:
+                            idContact = atoi(dataLineAddressBookFile.c_str());
+                            break;
+                        case 2:
+                            idUser = atoi(dataLineAddressBookFile.c_str());
+                            break;
+                        case 3:
+                            firstName = dataLineAddressBookFile;
+                            break;
+                        case 4:
+                            lastName = dataLineAddressBookFile;
+                            break;
+                        case 5:
+                            phoneNumber = dataLineAddressBookFile;
+                            break;
+                        case 6:
+                            email = dataLineAddressBookFile;
+                            break;
+                        case 7:
+                            address = dataLineAddressBookFile;
+                            break;
+                        }
+                        if (lineNumberAddressBookFile == 7) {
+                            if (idContact != id) {
+                                addressBookFileTemporary << idContact << "|";
+                                addressBookFileTemporary << idUser << "|";
+                                addressBookFileTemporary << firstName << "|";
+                                addressBookFileTemporary << lastName << "|";
+                                addressBookFileTemporary << phoneNumber << "|";
+                                addressBookFileTemporary << email << "|";
+                                addressBookFileTemporary << address << "|" << endl;
+                            }
+                            lineNumberAddressBookFile = 0;
+                        }
+                        lineNumberAddressBookFile++;
+                    }
+                    addressBookFile.close();
+                    addressBookFileTemporary.close();
+                    remove("Adress_Book.txt");
+                    rename("Adress_Book_Temporary.txt", "Adress_Book.txt");
                 }
                 cout << "The contact has been deleted!\n";
                 Sleep(1000);
-                addressBookFile.close();
                 return numberOfContacts - 1;
             } else {
                 cout << "The contact has not been deleted!\n";
@@ -421,6 +461,7 @@ int main() {
             cout << "2. Search by first name\n";
             cout << "3. Search by last name\n";
             cout << "4. View all contacts\n";
+            cout << "5. Delete contact\n";
             cout << "8. Log out\n";
             cout << "Your choice: ";
             cin >> userSelection;
@@ -438,6 +479,9 @@ int main() {
             case '4':
                 viewAllContacts(addressBook, numberOfContacts);
                 break;
+            case '5':
+                numberOfContacts = deleteContactData(addressBook, numberOfContacts);
+                break;
             case '8':
                 addressBook.clear();
                 idLoggedUser = 0;
@@ -445,12 +489,8 @@ int main() {
             }
         }
         /*
-            cout << "5. Delete contact\n";
             cout << "6. Edit contact\n";
 
-            case '5':
-                numberOfContacts = deleteContactData(addressBook, numberOfContacts);
-                break;
             case '6':
                 editContactData(addressBook, numberOfContacts);
                 break;
