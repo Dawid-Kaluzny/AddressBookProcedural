@@ -335,16 +335,19 @@ int deleteContactData(vector <ContactData>& addressBook, int numberOfContacts) {
 
 void editContactData(vector <ContactData>& addressBook, int numberOfContacts) {
     string firstName, lastName, phoneNumber, email, address;
-    int id;
+    fstream addressBookFile, addressBookFileTemporary;
+    int idUser, idContact;
+    string dataLineAddressBookFile;
+    int lineNumberAddressBookFile = 1;
+    int i = 0;
     char userSelection;
-    fstream addressBookFile;
 
     cin.ignore();
     cout << "Enter the user ID: ";
-    cin >> id;
+    cin >> idContact;
 
-    for (int i = 0; i < numberOfContacts; i++) {
-        if (addressBook[i].id == id) {
+    for (i; i < numberOfContacts; i++) {
+        if (addressBook[i].id == idContact) {
             system("cls");
             viewContact(addressBook, i);
 
@@ -401,15 +404,59 @@ void editContactData(vector <ContactData>& addressBook, int numberOfContacts) {
             }
             }
 
-            remove("Adress_Book.txt");
-            addressBookFile.open("Adress_Book.txt", ios::out | ios::app);
-            for (int j = 0; j < addressBook.size(); j++) {
-                addressBookFile << addressBook[j].id << "|";
-                addressBookFile << addressBook[j].firstName << "|";
-                addressBookFile << addressBook[j].lastName << "|";
-                addressBookFile << addressBook[j].phoneNumber << "|";
-                addressBookFile << addressBook[j].email << "|";
-                addressBookFile << addressBook[j].address << "|" << endl;
+            if (addressBookFile.good()) {
+                addressBookFile.open("Adress_Book.txt", ios::in);
+                addressBookFileTemporary.open("Adress_Book_Temporary.txt", ios::out | ios::app);
+                while(getline(addressBookFile, dataLineAddressBookFile, '|')) {
+                    switch(lineNumberAddressBookFile) {
+                    case 1:
+                        idContact = atoi(dataLineAddressBookFile.c_str());
+                        break;
+                    case 2:
+                        idUser = atoi(dataLineAddressBookFile.c_str());
+                        break;
+                    case 3:
+                        firstName = dataLineAddressBookFile;
+                        break;
+                    case 4:
+                        lastName = dataLineAddressBookFile;
+                        break;
+                    case 5:
+                        phoneNumber = dataLineAddressBookFile;
+                        break;
+                    case 6:
+                        email = dataLineAddressBookFile;
+                        break;
+                    case 7:
+                        address = dataLineAddressBookFile;
+                        break;
+                    }
+                    if (lineNumberAddressBookFile == 7) {
+                        if (idContact == addressBook[i].id) {
+                            addressBookFileTemporary << addressBook[i].id << "|";
+                            addressBookFileTemporary << idUser << "|";
+                            addressBookFileTemporary << addressBook[i].firstName << "|";
+                            addressBookFileTemporary << addressBook[i].lastName << "|";
+                            addressBookFileTemporary << addressBook[i].phoneNumber << "|";
+                            addressBookFileTemporary << addressBook[i].email << "|";
+                            addressBookFileTemporary << addressBook[i].address << "|" << endl;
+                        } else {
+                            addressBookFileTemporary << idContact << "|";
+                            addressBookFileTemporary << idUser << "|";
+                            addressBookFileTemporary << firstName << "|";
+                            addressBookFileTemporary << lastName << "|";
+                            addressBookFileTemporary << phoneNumber << "|";
+                            addressBookFileTemporary << email << "|";
+                            addressBookFileTemporary << address << "|" << endl;
+                        }
+                        lineNumberAddressBookFile = 0;
+                    }
+                    lineNumberAddressBookFile++;
+                }
+                addressBookFile.close();
+                addressBookFileTemporary.close();
+                remove("Adress_Book.txt");
+                rename("Adress_Book_Temporary.txt", "Adress_Book.txt");
             }
             cout << "Data has been changed!\n";
             Sleep(1000);
@@ -462,6 +509,7 @@ int main() {
             cout << "3. Search by last name\n";
             cout << "4. View all contacts\n";
             cout << "5. Delete contact\n";
+            cout << "6. Edit contact\n";
             cout << "8. Log out\n";
             cout << "Your choice: ";
             cin >> userSelection;
@@ -482,18 +530,14 @@ int main() {
             case '5':
                 numberOfContacts = deleteContactData(addressBook, numberOfContacts);
                 break;
+            case '6':
+                editContactData(addressBook, numberOfContacts);
+                break;
             case '8':
                 addressBook.clear();
                 idLoggedUser = 0;
                 break;
             }
         }
-        /*
-            cout << "6. Edit contact\n";
-
-            case '6':
-                editContactData(addressBook, numberOfContacts);
-                break;
-        */
     }
 }
