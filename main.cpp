@@ -468,6 +468,32 @@ void editContactData(vector <ContactData>& addressBook, int numberOfContacts) {
     Sleep(1000);
 }
 
+void changePassword(vector <UserData>& users, int numberOfUsers, int idLoggedUser) {
+    string password;
+    fstream usersFile;
+
+    cout << "Enter new password: ";
+    cin >> password;
+
+    for (int i = 0; i < numberOfUsers; i++) {
+        if (users[i].id == idLoggedUser) {
+            users[i].password = password;
+        }
+    }
+    remove("Users.txt");
+    if (usersFile.good()) {
+        usersFile.open("Users.txt", ios::out | ios::app);
+        for (int i = 0; i < numberOfUsers; i++) {
+            usersFile << users[i].id << "|";
+            usersFile << users[i].login << "|";
+            usersFile << users[i].password << "|" << endl;
+        }
+        usersFile.close();
+    }
+    cout << "Password has been changed\n";
+    Sleep(1500);
+}
+
 int main() {
     vector <UserData> users;
     vector <ContactData> addressBook;
@@ -510,6 +536,7 @@ int main() {
             cout << "4. View all contacts\n";
             cout << "5. Delete contact\n";
             cout << "6. Edit contact\n";
+            cout << "7. Change password\n";
             cout << "8. Log out\n";
             cout << "Your choice: ";
             cin >> userSelection;
@@ -532,6 +559,9 @@ int main() {
                 break;
             case '6':
                 editContactData(addressBook, numberOfContacts);
+                break;
+            case '7':
+                changePassword(users, numberOfUsers, idLoggedUser);
                 break;
             case '8':
                 addressBook.clear();
