@@ -249,7 +249,7 @@ int loadDataFileAddressBook (int idLoggedUser, vector <ContactData>& addressBook
     return numberOfContacts;
 }
 
-int deleteContactData(vector <ContactData>& addressBook, int numberOfContacts) {
+int deleteContactData(vector <ContactData>& addressBook, int numberOfContacts, int &idLastContactAdressBook) {
     int id;
     char userSelection;
     fstream addressBookFile, addressBookFileTemporary;
@@ -259,7 +259,7 @@ int deleteContactData(vector <ContactData>& addressBook, int numberOfContacts) {
     int lineNumberAddressBookFile = 1;
 
     cin.ignore();
-    cout << "Enter the user ID: ";
+    cout << "Enter the contact ID: ";
     cin >> id;
     cout << endl;
 
@@ -308,6 +308,7 @@ int deleteContactData(vector <ContactData>& addressBook, int numberOfContacts) {
                                 addressBookFileTemporary << phoneNumber << "|";
                                 addressBookFileTemporary << email << "|";
                                 addressBookFileTemporary << address << "|" << endl;
+                                idLastContactAdressBook = idContact;
                             }
                             lineNumberAddressBookFile = 0;
                         }
@@ -555,7 +556,7 @@ int main() {
                 viewAllContacts(addressBook, numberOfContacts);
                 break;
             case '5':
-                numberOfContacts = deleteContactData(addressBook, numberOfContacts);
+                numberOfContacts = deleteContactData(addressBook, numberOfContacts, idLastContactAdressBook);
                 break;
             case '6':
                 editContactData(addressBook, numberOfContacts);
